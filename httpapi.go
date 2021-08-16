@@ -97,7 +97,7 @@ func Testget(thurl string) {
 }
 
 ///???
-func postWithJson_AdminCreateNFT(thurl string, actionName string, myappid string, Adminaddr string, addr string, nu uint64) {
+func PostWithJson_AdminCreateNFT(thurl string, actionName string, myappid string, Adminaddr string, addr string, nu uint64) []byte {
 	now := uint64(time.Now().Unix()) //获取当前时间
 	fmt.Println(now)
 	by := make([]byte, 8)               //建立数组
@@ -120,9 +120,9 @@ func postWithJson_AdminCreateNFT(thurl string, actionName string, myappid string
 	ba, _ := json.Marshal(messages)
 	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("Post request with json result: %s\n", string(body))
+	return body
 }
-func postWithJson_safeTransfer(thurl string, actionName string, myappid string, from string, to string, id uint64, number uint64, password string) {
+func PostWithJson_safeTransfer(thurl string, actionName string, myappid string, from string, to string, id uint64, number uint64, password string) []byte {
 	now := uint64(time.Now().Unix()) //获取当前时间
 	fmt.Println(now)
 	by := make([]byte, 8)               //建立数组
@@ -149,9 +149,9 @@ func postWithJson_safeTransfer(thurl string, actionName string, myappid string, 
 	ba, _ := json.Marshal(messages)
 	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("Post request with json result: %s\n", string(body))
+	return body
 }
-func postWithJson_userregit(thurl string, actionName string, myappid string, pass string) {
+func PostWithJson_userregit(thurl string, actionName string, myappid string, pass string) []byte {
 	now := uint64(time.Now().Unix()) //获取当前时间
 	fmt.Println(now)
 	by := make([]byte, 8)               //建立数组
@@ -183,9 +183,9 @@ func postWithJson_userregit(thurl string, actionName string, myappid string, pas
 	ba, _ := json.Marshal(messages)
 	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("Post request with json result: %s\n", string(body))
+	return body
 }
-func postWithJson_userupdatapassword(thurl string, actionName string, myappid string, addr string, oldpassword string, newpassword string) {
+func PostWithJson_userupdatapassword(thurl string, actionName string, myappid string, addr string, oldpassword string, newpassword string) []byte {
 	now := uint64(time.Now().Unix()) //获取当前时间
 	fmt.Println(now)
 	by := make([]byte, 8)               //建立数组
@@ -219,10 +219,10 @@ func postWithJson_userupdatapassword(thurl string, actionName string, myappid st
 	ba, _ := json.Marshal(messages)
 	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("Post request with json result: %s\n", string(body))
+	return body
 }
 
-func postWithJson_safeBatchTransfer(thurl string, actionName string, myappid string, from string, to string, ids []uint64, numbers []uint64, password string) {
+func PostWithJson_safeBatchTransfer(thurl string, actionName string, myappid string, from string, to string, ids []uint64, numbers []uint64, password string) []byte {
 	now := uint64(time.Now().Unix()) //获取当前时间
 	fmt.Println(now)
 	by := make([]byte, 8)               //建立数组
@@ -259,11 +259,11 @@ func postWithJson_safeBatchTransfer(thurl string, actionName string, myappid str
 	ba, _ := json.Marshal(messages)
 	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("Post request with json result: %s\n", string(body))
+	return body
 }
 
 //查询NFT_INDEX
-func postWithJson_getNftIndex(thurl string, actionName string, myappid string) {
+func PostWithJson_getNftIndex(thurl string, actionName string, myappid string) []byte {
 	now := uint64(time.Now().Unix()) //获取当前时间
 	fmt.Println(now)
 	by := make([]byte, 8)               //建立数组
@@ -280,11 +280,11 @@ func postWithJson_getNftIndex(thurl string, actionName string, myappid string) {
 	ba, _ := json.Marshal(messages)
 	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("Post request with json result: %s\n", string(body))
+	return body
 }
 
 //查询
-func postWithJson_balanceOf(thurl string, actionName string, myappid string, addr string, ids uint64) {
+func PostWithJson_balanceOf(thurl string, actionName string, myappid string, addr string, ids uint64) []byte {
 	now := uint64(time.Now().Unix()) //获取当前时间
 	fmt.Println(now)
 	by := make([]byte, 8)               //建立数组
@@ -308,11 +308,11 @@ func postWithJson_balanceOf(thurl string, actionName string, myappid string, add
 	ba, _ := json.Marshal(messages)
 	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("Post request with json result: %s\n", string(body))
+	return body
 }
 
 //Batch查询
-func postWithJson_balanceOfBatch(thurl string, actionName string, myappid string, addrs []string, ids []uint64, addrnumber uint64) {
+func PostWithJson_balanceOfBatch(thurl string, actionName string, myappid string, addrs []string, ids []uint64, addrnumber uint64) []byte {
 	now := uint64(time.Now().Unix()) //获取当前时间
 	fmt.Println(now)
 	by := make([]byte, 8)               //建立数组
@@ -348,7 +348,7 @@ func postWithJson_balanceOfBatch(thurl string, actionName string, myappid string
 	ba, _ := json.Marshal(messages)
 	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("Post request with json result: %s\n", string(body))
+	return body
 }
 
 //使用rsa公钥加密文件
