@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"net/http"
 	"os"
 	"time"
@@ -80,6 +81,59 @@ type BanlaceOfBatch_Message struct {
 	Addr       []byte `json:"addr"`
 	Id         []byte `json:"id"`
 	AddrNumber []byte `json:"addrnumber"`
+}
+
+//Event res
+type safeTransferFromEvent struct {
+	Type     string `json:"type"`
+	Txhash   string `json:"txhash"`
+	Operator string `json:"operator"`
+	From     string `json:"from"`
+	To       string `json:"to"`
+	Id       string `json:"id"`
+	Value    string `json:"value"`
+}
+type safeBatchTransferFromEvent struct {
+	Type     string    `json:"type"`
+	Txhash   string    `json:"txhash"`
+	Operator string    `json:"operator"`
+	From     string    `json:"from"`
+	To       string    `json:"to"`
+	Ids      []big.Int `json:"ids"`
+	Values   []big.Int `json:"values"`
+}
+type adminCreateNFT struct {
+	Type     string `json:"type"`
+	Txhash   string `json:"txhash"`
+	Operator string `json:"operator"`
+	Minter   string `json:"minter"`
+	Amount   string `json:"amount"`
+	NFTID    string `json:"NFTID"`
+}
+type RespbalanceOfBatch struct {
+	Code    string    `json:"code"`
+	Msg     []big.Int `json:"msg"`
+	TimeSub int64     `json:"timesub"`
+}
+type RespNor struct {
+	Code    string `json:"code"`
+	Msg     string `json:"msg"`
+	TimeSub int64  `json:"timesub"`
+}
+type Resp struct {
+	Code    string         `json:"code"`
+	Msg     adminCreateNFT `json:"msg"`
+	TimeSub int64          `json:"timesub"`
+}
+type Resp_trs struct {
+	Code    string                `json:"code"`
+	Msg     safeTransferFromEvent `json:"msg"`
+	TimeSub int64                 `json:"timesub"`
+}
+type Resp_trsBatch struct {
+	Code    string                     `json:"code"`
+	Msg     safeBatchTransferFromEvent `json:"msg"`
+	TimeSub int64                      `json:"timesub"`
 }
 
 func Testget(thurl string) {
