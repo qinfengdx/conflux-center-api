@@ -145,7 +145,11 @@ func Testget(thurl string) {
 		return
 	}
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("error")
+	}
+
 	//fmt.Println(string(body))
 	fmt.Printf("Get request result: %s\n", string(body))
 }
@@ -171,9 +175,18 @@ func PostWithJson_AdminCreateNFT(thurl string, actionName string, myappid string
 
 	//post请求提交json数据
 	messages := AdminCreateToken_Message{src_appid, src_mytime, src_mydata, src_admin, src_number, src_creator}
-	ba, _ := json.Marshal(messages)
-	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
-	body, _ := ioutil.ReadAll(resp.Body)
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal 1error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
 	return body
 }
 func PostWithJson_safeTransfer(thurl string, actionName string, myappid string, from string, to string, id uint64, number uint64, password string) []byte {
@@ -200,9 +213,18 @@ func PostWithJson_safeTransfer(thurl string, actionName string, myappid string, 
 	src_password := publicEncode([]byte(password), "public.pem")
 	//post请求提交json数据
 	messages := SafeTransferFrom_Message{src_appid, src_mytime, src_mydata, src_from, src_to, src_id, src_number, src_password}
-	ba, _ := json.Marshal(messages)
-	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
-	body, _ := ioutil.ReadAll(resp.Body)
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal 1error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
 	return body
 }
 func PostWithJson_userregit(thurl string, actionName string, myappid string, pass string) []byte {
@@ -234,9 +256,18 @@ func PostWithJson_userregit(thurl string, actionName string, myappid string, pas
 	fmt.Println(c)
 	//post请求提交json数据
 	messages := UserRegite_Message{src_appid, src_mytime, src_mydata, src_password}
-	ba, _ := json.Marshal(messages)
-	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
-	body, _ := ioutil.ReadAll(resp.Body)
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
 	return body
 }
 func PostWithJson_userupdatapassword(thurl string, actionName string, myappid string, addr string, oldpassword string, newpassword string) []byte {
@@ -270,9 +301,18 @@ func PostWithJson_userupdatapassword(thurl string, actionName string, myappid st
 	fmt.Println(c)
 	//post请求提交json数据
 	messages := UserUpdataPassword_Message{src_appid, src_mytime, src_mydata, src_addr, src_oldpassword, src_newpassword}
-	ba, _ := json.Marshal(messages)
-	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
-	body, _ := ioutil.ReadAll(resp.Body)
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
 	return body
 }
 
@@ -310,9 +350,18 @@ func PostWithJson_safeBatchTransfer(thurl string, actionName string, myappid str
 	src_password := publicEncode([]byte(password), "public.pem")
 	//post请求提交json数据
 	messages := SafeBatchTransferFrom_Message{src_appid, src_mytime, src_mydata, src_from, src_to, src_ids, src_numbers, src_password}
-	ba, _ := json.Marshal(messages)
-	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
-	body, _ := ioutil.ReadAll(resp.Body)
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
 	return body
 }
 
@@ -331,9 +380,18 @@ func PostWithJson_getNftIndex(thurl string, actionName string, myappid string) [
 	src_mydata := publicEncode(mydata, "public.pem")
 	//post请求提交json数据
 	messages := GetNftIndex_Message{src_appid, src_mytime, src_mydata}
-	ba, _ := json.Marshal(messages)
-	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
-	body, _ := ioutil.ReadAll(resp.Body)
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
 	return body
 }
 
@@ -359,9 +417,18 @@ func PostWithJson_balanceOf(thurl string, actionName string, myappid string, add
 
 	//post请求提交json数据
 	messages := BanlaceOf_Message{src_appid, src_mytime, src_mydata, src_myaddr, src_myid}
-	ba, _ := json.Marshal(messages)
-	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
-	body, _ := ioutil.ReadAll(resp.Body)
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
 	return body
 }
 
@@ -399,9 +466,18 @@ func PostWithJson_balanceOfBatch(thurl string, actionName string, myappid string
 	src_addrnum := publicEncode(addrnum, "public.pem")
 	//post请求提交json数据
 	messages := BanlaceOfBatch_Message{src_appid, src_mytime, src_mydata, src_myaddrs, src_myids, src_addrnum}
-	ba, _ := json.Marshal(messages)
-	resp, _ := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
-	body, _ := ioutil.ReadAll(resp.Body)
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
 	return body
 }
 
