@@ -135,6 +135,12 @@ type Resp_trsBatch struct {
 	Msg     safeBatchTransferFromEvent `json:"msg"`
 	TimeSub int64                      `json:"timesub"`
 }
+type GetNFTCreator_Message struct {
+	Appid []byte `json:"appid"`
+	Time  []byte `json:"emit"`
+	Data  []byte `json:"data"`
+	Id    []byte `json:"id"`
+}
 
 func Testget(thurl string) {
 	//get请求
@@ -466,6 +472,41 @@ func PostWithJson_balanceOfBatch(thurl string, actionName string, myappid string
 	src_addrnum := publicEncode(addrnum, "public.pem")
 	//post请求提交json数据
 	messages := BanlaceOfBatch_Message{src_appid, src_mytime, src_mydata, src_myaddrs, src_myids, src_addrnum}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//查询
+func PostWithJson_GetNFTCreator(thurl string, actionName string, myappid string, ids uint64) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("balanceOf")
+	nu := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(nu, ids) //uint64转数组
+	myid := []byte(nu)
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_myid := publicEncode(myid, "public.pem")
+
+	//post请求提交json数据
+	messages := GetNFTCreator_Message{src_appid, src_mytime, src_mydata, src_myid}
 	ba, err := json.Marshal(messages)
 	if err != nil {
 		return []byte("json.Marshal error")
