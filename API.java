@@ -86,11 +86,11 @@ public class API {
     }
 
     /**
-     * 初始化RSA非对称加密
+     * 初始化RSA非对称加密 "D:\\public.pem"
      * @throws IOException
      */
-    public  void RSAInit() throws IOException {
-        FileInputStream fs=new FileInputStream("D:\\public.pem");
+    public  void RSAInit(String publicKeypath) throws IOException {
+        FileInputStream fs=new FileInputStream(publicKeypath);
         byte[] buffer=new byte[fs.available()];
         fs.read(buffer);
         fs.close();
@@ -462,9 +462,41 @@ public class API {
     }
 
 
+    /**
+     * 2021.09.02新增  通过ID 返回初始创造者地址，用于持续收益追踪
+     * @param ActionName
+     * @param myappid
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public  JSONObject PostWithJson_GetNFTCreator(String ActionName,String myappid,long id) throws Exception {
+        JSONObject json=new JSONObject();
 
+        Date dat= new Date();
+        long timeL=dat.getTime()/1000;
+        byte[] times=longToBytes(timeL);
 
+        byte[] mydata="GetNFTCreator".getBytes();
 
+        byte[] timeEN = encrypt(times,PUK);
+        byte[] mydataEN = encrypt(mydata,PUK);
+        byte[] myappidEN = encrypt(myappid.getBytes(),PUK);
+        byte[] idEN = encrypt(longToBytes(id),PUK);
+        json.put("appid", myappidEN);
+        json.put("emit", timeEN);
+        json.put("data", mydataEN);
+        json.put("id", idEN);
+        String json_Str = null;
+        try {
+            //System.out.println(JSONObject.toJSONString(json));
+            json_Str=doPost(theurl+"/"+ActionName,JSONObject.toJSONString(json));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        JSONObject json_obj= JSONObject.parseObject(json_Str);
+        return json_obj;
+    }
 
 
 
