@@ -16,6 +16,13 @@ import (
 	"time"
 )
 
+type SearchSPONSOR_Message struct {
+	Appid []byte `json:"appid"`
+	Time  []byte `json:"emit"`
+	Data  []byte `json:"data"`
+	Addr  []byte `json:"addr"`
+}
+
 type auth struct {
 	Username string `json:"username"`
 	Pwd      string `json:"password"`
@@ -450,7 +457,7 @@ func PostWithJson_balanceOfBatch(thurl string, actionName string, myappid string
 	//加密数据
 	appid := []byte(myappid)
 	mytime := []byte(by)
-	mydata := []byte("balanceOf")
+	mydata := []byte("balanceOfBatch")
 
 	var ids_one []byte
 	for i := 0; i < len(ids); i++ {
@@ -496,7 +503,7 @@ func PostWithJson_GetNFTCreator(thurl string, actionName string, myappid string,
 	//加密数据
 	appid := []byte(myappid)
 	mytime := []byte(by)
-	mydata := []byte("balanceOf")
+	mydata := []byte("GetNFTCreator")
 	nu := make([]byte, 8)               //建立数组
 	binary.BigEndian.PutUint64(nu, ids) //uint64转数组
 	myid := []byte(nu)
@@ -507,6 +514,102 @@ func PostWithJson_GetNFTCreator(thurl string, actionName string, myappid string,
 
 	//post请求提交json数据
 	messages := GetNFTCreator_Message{src_appid, src_mytime, src_mydata, src_myid}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//查询白名单
+func PostWithJson_SearchSPONSOR(thurl string, actionName string, myappid string, addr string) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("SearchSPONSOR")
+	myaddr := []byte(addr)
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_myaddr := publicEncode(myaddr, "public.pem")
+	//post请求提交json数据
+	messages := SearchSPONSOR_Message{src_appid, src_mytime, src_mydata, src_myaddr}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//设置白名单
+func PostWithJson_SetSPONSOR(thurl string, actionName string, myappid string, addr string) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("SetSPONSOR")
+	myaddr := []byte(addr)
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_myaddr := publicEncode(myaddr, "public.pem")
+	//post请求提交json数据
+	messages := SearchSPONSOR_Message{src_appid, src_mytime, src_mydata, src_myaddr}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//移除白名单
+func PostWithJson_RemoveSPONSOR(thurl string, actionName string, myappid string, addr string) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("RemoveSPONSOR")
+	myaddr := []byte(addr)
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_myaddr := publicEncode(myaddr, "public.pem")
+	//post请求提交json数据
+	messages := SearchSPONSOR_Message{src_appid, src_mytime, src_mydata, src_myaddr}
 	ba, err := json.Marshal(messages)
 	if err != nil {
 		return []byte("json.Marshal error")
