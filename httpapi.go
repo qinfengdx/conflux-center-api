@@ -258,14 +258,14 @@ func PostWithJson_AdminCreateNFTBatch(thurl string, actionName string, myappid s
 		ADDR := []byte(addrs[i])
 		addrs_one = append(addrs_one, ADDR...)
 	}
-	fmt.Println(string(addrs_one))
+
 	src_myaddrs, err := publicEncodeLong(addrs_one, "public.pem")
 	if err != nil {
 		fmt.Println("RSA长加密出错！", err)
 		panic(err)
 	}
 	src_admin := publicEncode([]byte(Adminaddr), "public.pem")
-	fmt.Println(string(src_myaddrs))
+	// fmt.Println(string(src_myaddrs))
 	//post请求提交json数据
 	messages := AdminCreateTokenBatch_Message{src_appid, src_mytime, src_mydata, src_admin, src_myaddrs, src_number}
 	ba, err := json.Marshal(messages)
