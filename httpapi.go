@@ -171,7 +171,6 @@ type BurnFromBatch_Message struct {
 	Data     []byte `json:"data"`
 	Form     []byte `json:"from"`
 	Ids      []byte `json:"ids"`
-	Numbers  []byte `json:"numbers"`
 	Password []byte `json:"password"`
 }
 type Uri_Message struct {
@@ -323,14 +322,12 @@ func PostWithJson_Burn(thurl string, actionName string, myappid string, from str
 }
 
 //销毁多个NFT（同一地址）
-func PostWithJson_BurnBatch(thurl string, actionName string, myappid string, addrs string, ids []uint64, addrnumber uint64, password string) []byte {
+func PostWithJson_BurnBatch(thurl string, actionName string, myappid string, addrs string, ids []uint64, password string) []byte {
 	now := uint64(time.Now().Unix()) //获取当前时间
 	fmt.Println(now)
 	by := make([]byte, 8)               //建立数组
 	binary.BigEndian.PutUint64(by, now) //uint64转数组
 
-	addrnum := make([]byte, 8)                      //建立数组
-	binary.BigEndian.PutUint64(addrnum, addrnumber) //uint64转数组
 	//加密数据
 	appid := []byte(myappid)
 	mytime := []byte(by)
@@ -348,10 +345,9 @@ func PostWithJson_BurnBatch(thurl string, actionName string, myappid string, add
 	src_mydata := publicEncode(mydata, "public.pem")
 	src_myaddrs := publicEncode(ADDR, "public.pem")
 	src_myids := publicEncode(ids_one, "public.pem")
-	src_addrnum := publicEncode(addrnum, "public.pem")
 	src_password := publicEncode([]byte(password), "public.pem")
 	//post请求提交json数据
-	messages := BurnFromBatch_Message{src_appid, src_mytime, src_mydata, src_myaddrs, src_myids, src_addrnum, src_password}
+	messages := BurnFromBatch_Message{src_appid, src_mytime, src_mydata, src_myaddrs, src_myids, src_password}
 	ba, err := json.Marshal(messages)
 	if err != nil {
 		return []byte("json.Marshal error")
