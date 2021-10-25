@@ -148,6 +148,38 @@ type GetNFTCreator_Message struct {
 	Data  []byte `json:"data"`
 	Id    []byte `json:"id"`
 }
+type AdminCreateTokenBatch_Message struct {
+	Appid      []byte `json:"appid"`
+	Time       []byte `json:"emit"`
+	Data       []byte `json:"data"`
+	AdminAddr  []byte `json:"adminaddr"`
+	Creaters   []byte `json:"creaters"`
+	AddrNumber []byte `json:"addrnumber"`
+}
+type BurnFrom_Message struct {
+	Appid    []byte `json:"appid"`
+	Time     []byte `json:"emit"`
+	Data     []byte `json:"data"`
+	Form     []byte `json:"from"`
+	Id       []byte `json:"id"`
+	Number   []byte `json:"number"`
+	Password []byte `json:"password"`
+}
+type BurnFromBatch_Message struct {
+	Appid    []byte `json:"appid"`
+	Time     []byte `json:"emit"`
+	Data     []byte `json:"data"`
+	Form     []byte `json:"from"`
+	Ids      []byte `json:"ids"`
+	Numbers  []byte `json:"numbers"`
+	Password []byte `json:"password"`
+}
+type Uri_Message struct {
+	Appid []byte `json:"appid"`
+	Time  []byte `json:"emit"`
+	Data  []byte `json:"data"`
+	ID    []byte `json:"ID"`
+}
 
 func Testget(thurl string) {
 	//get请求
@@ -191,6 +223,236 @@ func PostWithJson_AdminCreateNFT(thurl string, actionName string, myappid string
 	ba, err := json.Marshal(messages)
 	if err != nil {
 		return []byte("json.Marshal 1error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//批量生成1个NFT
+func PostWithJson_AdminCreateNFTBatch(thurl string, actionName string, myappid string, Adminaddr string, addrs []string, addrsNumber uint64) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("AdminCreateNFTBatch")
+	//数量
+	NUM := make([]byte, 8)                       //建立数组
+	binary.BigEndian.PutUint64(NUM, addrsNumber) //uint64转数组
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_number := publicEncode(NUM, "public.pem")
+
+	var addrs_one []byte
+	for i := 0; i < len(addrs); i++ {
+		ADDR := []byte(addrs[i])
+		addrs_one = append(addrs_one, ADDR...)
+	}
+
+	src_admin := publicEncode([]byte(Adminaddr), "public.pem")
+
+	//post请求提交json数据
+	messages := AdminCreateTokenBatch_Message{src_appid, src_mytime, src_mydata, src_admin, addrs_one, src_number}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal 1error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//销毁单个NFT
+func PostWithJson_Burn(thurl string, actionName string, myappid string, from string, id uint64, number uint64, password string) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("Burn")
+	ID := make([]byte, 8)                   //建立数组
+	binary.BigEndian.PutUint64(ID, id)      //uint64转数组
+	NUM := make([]byte, 8)                  //建立数组
+	binary.BigEndian.PutUint64(NUM, number) //uint64转数组
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+
+	src_from := publicEncode([]byte(from), "public.pem")
+	src_id := publicEncode(ID, "public.pem")
+	src_number := publicEncode(NUM, "public.pem")
+	src_password := publicEncode([]byte(password), "public.pem")
+	//post请求提交json数据
+	messages := BurnFrom_Message{src_appid, src_mytime, src_mydata, src_from, src_id, src_number, src_password}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal 1error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//销毁多个NFT（同一地址）
+func PostWithJson_BurnBatch(thurl string, actionName string, myappid string, addrs string, ids []uint64, addrnumber uint64, password string) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+
+	addrnum := make([]byte, 8)                      //建立数组
+	binary.BigEndian.PutUint64(addrnum, addrnumber) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("BurnBatch")
+
+	var ids_one []byte
+	for i := 0; i < len(ids); i++ {
+		ID := make([]byte, 8)                  //建立数组
+		binary.BigEndian.PutUint64(ID, ids[i]) //uint64转数组
+		ids_one = append(ids_one, ID...)
+	}
+	ADDR := []byte(addrs)
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_myaddrs := publicEncode(ADDR, "public.pem")
+	src_myids := publicEncode(ids_one, "public.pem")
+	src_addrnum := publicEncode(addrnum, "public.pem")
+	src_password := publicEncode([]byte(password), "public.pem")
+	//post请求提交json数据
+	messages := BurnFromBatch_Message{src_appid, src_mytime, src_mydata, src_myaddrs, src_myids, src_addrnum, src_password}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//查询 NFT 的matadata  uri
+func PostWithJson_Uri(thurl string, actionName string, myappid string, ids uint64) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("Uri")
+	nu := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(nu, ids) //uint64转数组
+	myid := []byte(nu)
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_myid := publicEncode(myid, "public.pem")
+
+	//post请求提交json数据
+	messages := Uri_Message{src_appid, src_mytime, src_mydata, src_myid}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//查询 用户拥有的所有NFT
+func PostWithJson_UserNFTs(thurl string, actionName string, myappid string, addr string) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("UserNFTs")
+	myaddr := []byte(addr)
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_myaddr := publicEncode(myaddr, "public.pem")
+
+	//post请求提交json数据
+	messages := SearchSPONSOR_Message{src_appid, src_mytime, src_mydata, src_myaddr}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//查询 NFT 的属于谁
+func PostWithJson_OwnerOf(thurl string, actionName string, myappid string, ids uint64) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("Uri")
+	nu := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(nu, ids) //uint64转数组
+	myid := []byte(nu)
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_myid := publicEncode(myid, "public.pem")
+
+	//post请求提交json数据
+	messages := Uri_Message{src_appid, src_mytime, src_mydata, src_myid}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal error")
 	}
 	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
 	if err != nil {
