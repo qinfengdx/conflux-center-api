@@ -258,11 +258,11 @@ func PostWithJson_AdminCreateNFTBatch(thurl string, actionName string, myappid s
 		ADDR := []byte(addrs[i])
 		addrs_one = append(addrs_one, ADDR...)
 	}
-
+	src_myaddrs := publicEncode(addrs_one, "public.pem")
 	src_admin := publicEncode([]byte(Adminaddr), "public.pem")
-
+	fmt.Println(string(src_myaddrs))
 	//post请求提交json数据
-	messages := AdminCreateTokenBatch_Message{src_appid, src_mytime, src_mydata, src_admin, addrs_one, src_number}
+	messages := AdminCreateTokenBatch_Message{src_appid, src_mytime, src_mydata, src_admin, src_myaddrs, src_number}
 	ba, err := json.Marshal(messages)
 	if err != nil {
 		return []byte("json.Marshal 1error")
