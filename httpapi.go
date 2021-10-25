@@ -258,7 +258,12 @@ func PostWithJson_AdminCreateNFTBatch(thurl string, actionName string, myappid s
 		ADDR := []byte(addrs[i])
 		addrs_one = append(addrs_one, ADDR...)
 	}
-	src_myaddrs := publicEncode(addrs_one, "public.pem")
+	fmt.Println(string(addrs_one))
+	src_myaddrs, err := publicEncodeLong(addrs_one, "public.pem")
+	if err != nil {
+		fmt.Println("RSA长加密出错！", err)
+		panic(err)
+	}
 	src_admin := publicEncode([]byte(Adminaddr), "public.pem")
 	fmt.Println(string(src_myaddrs))
 	//post请求提交json数据
@@ -914,4 +919,53 @@ func publicEncode(plainText []byte, filename string) []byte {
 		panic(err3)
 	}
 	return cipherText
+}
+
+//使用rsa公钥加密文件
+func publicEncodeLong(plainText []byte, filename string) ([]byte, error) {
+
+	//1. 读取公钥信息 放到data变量中
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	stat, _ := file.Stat() //得到文件属性信息
+	data := make([]byte, stat.Size())
+	file.Read(data)
+	file.Close()
+	//2. 将得到的字符串pem解码
+	block, _ := pem.Decode(data)
+
+	//3. 使用x509将编码之后的公钥解析出来
+	pubInterface, err2 := x509.ParsePKIXPublicKey(block.Bytes)
+	if err2 != nil {
+		panic(err2)
+	}
+	pubKey := pubInterface.(*rsa.PublicKey)
+	partLen := pubKey.N.BitLen()/8 - 11
+	chunks := split(plainText, partLen)
+	buffer := bytes.NewBufferString("")
+	for _, chunk := range chunks {
+		bytes, err := rsa.EncryptPKCS1v15(rand.Reader, pubKey, chunk)
+		if err != nil {
+			return nil, err
+		}
+		buffer.Write(bytes)
+	}
+	return buffer.Bytes(), nil
+
+}
+
+// 、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、、
+func split(buf []byte, lim int) [][]byte {
+	var chunk []byte
+	chunks := make([][]byte, 0, len(buf)/lim+1)
+	for len(buf) >= lim {
+		chunk, buf = buf[:lim], buf[lim:]
+		chunks = append(chunks, chunk)
+	}
+	if len(buf) > 0 {
+		chunks = append(chunks, buf[:])
+	}
+	return chunks
 }
