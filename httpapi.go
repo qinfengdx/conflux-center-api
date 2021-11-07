@@ -46,6 +46,15 @@ type UserRegite_Message struct {
 	Data     []byte `json:"data"`
 	Password []byte `json:"password"`
 }
+type AdminTransferTokenBatch_Message struct {
+	Appid      []byte `json:"appid"`
+	Time       []byte `json:"emit"`
+	Data       []byte `json:"data"`
+	AdminAddr  []byte `json:"adminaddr"`
+	Creaters   []byte `json:"creaters"`
+	Ids        []byte `json:"ids"`
+	AddrNumber []byte `json:"addrnumber"`
+}
 type UserUpdataPassword_Message struct {
 	Appid       []byte `json:"appid"`
 	Time        []byte `json:"emit"`
@@ -267,6 +276,60 @@ func PostWithJson_AdminCreateNFTBatch(thurl string, actionName string, myappid s
 	// fmt.Println(string(src_myaddrs))
 	//post请求提交json数据
 	messages := AdminCreateTokenBatch_Message{src_appid, src_mytime, src_mydata, src_admin, src_myaddrs, src_number}
+	ba, err := json.Marshal(messages)
+	if err != nil {
+		return []byte("json.Marshal 1error")
+	}
+	resp, err := http.Post(thurl+"/"+actionName+"", "application/json", bytes.NewBuffer([]byte(ba)))
+	if err != nil {
+		return []byte("http error")
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte("ReadAll error")
+	}
+	return body
+}
+
+//批量转移NFT
+func PostWithJson_AdminTransferNFTBatch(thurl string, actionName string, myappid string, Adminaddr string, addrs []string, ids []uint64, addrsNumber uint64) []byte {
+	now := uint64(time.Now().Unix()) //获取当前时间
+	fmt.Println(now)
+	by := make([]byte, 8)               //建立数组
+	binary.BigEndian.PutUint64(by, now) //uint64转数组
+	//加密数据
+	appid := []byte(myappid)
+	mytime := []byte(by)
+	mydata := []byte("AdminCreateNFTBatch")
+	//数量
+	NUM := make([]byte, 8)                       //建立数组
+	binary.BigEndian.PutUint64(NUM, addrsNumber) //uint64转数组
+	src_appid := publicEncode(appid, "public.pem")
+	src_mytime := publicEncode(mytime, "public.pem")
+	src_mydata := publicEncode(mydata, "public.pem")
+	src_number := publicEncode(NUM, "public.pem")
+
+	var addrs_one []byte
+	for i := 0; i < len(addrs); i++ {
+		ADDR := []byte(addrs[i])
+		addrs_one = append(addrs_one, ADDR...)
+	}
+	var ids_one []byte
+	for i := 0; i < len(ids); i++ {
+		ID := make([]byte, 8)                  //建立数组
+		binary.BigEndian.PutUint64(ID, ids[i]) //uint64转数组
+		ids_one = append(ids_one, ID...)
+	}
+	src_myaddrs, err := publicEncodeLong(addrs_one, "public.pem")
+	if err != nil {
+		fmt.Println("RSA长加密出错！", err)
+		panic(err)
+	}
+	src_ids_one, err := publicEncodeLong(ids_one, "public.pem")
+	src_admin := publicEncode([]byte(Adminaddr), "public.pem")
+	// fmt.Println(string(src_myaddrs))
+	//post请求提交json数据
+	messages := AdminTransferTokenBatch_Message{src_appid, src_mytime, src_mydata, src_admin, src_myaddrs, src_ids_one, src_number}
 	ba, err := json.Marshal(messages)
 	if err != nil {
 		return []byte("json.Marshal 1error")
